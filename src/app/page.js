@@ -1,95 +1,77 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import axios from "axios";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import "./style.css";
+import { useRouter } from 'next/navigation'
 
-export default function Home() {
+export default function Page() {
+  const router = useRouter()
+  const [data, setData] = useState([]);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/products")
+      .then((response) => {
+        setData(response.data.result)
+      })
+      .catch((error) => {
+        console.log("error", error)
+      })
+  }, [show])
+
+
+  const handleDelete = (e) => {
+    setShow(true)
+    const productID = e.target.value;
+    console.log("e.t.v", e.target.value)
+    axios.delete(`http://localhost:3000/api/products/${productID}`)
+      .then((response) => {
+        console.log("response", response)
+        setShow(false)
+      })
+      .catch((error) => {
+        console.log("error", error)
+      })
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div className="container ">
+      <h3>Products Table</h3>
+      <hr />
+      <table className="table">
+        <thead className="thead-dark">
+          <tr>
+            <th scope="col">S.No.</th>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Color</th>
+            <th scope="col">Company</th>
+            <th scope="col">Category</th>
+            <th scope="col">Update</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data?.map((item, index) => (
+            <tr key={index}>
+              <th scope="row">{index + 1}</th>
+              <td >{item.name}</td>
+              <td >{item.price}</td>
+              <td >{item.color}</td>
+              <td >{item.company}</td>
+              <td >{item.category}</td>
+              <td ><Link href={"/products/" + item._id}>Edit</Link></td>
+              <td ><button className="btn btn-outline-danger" onClick={handleDelete} value={item._id}>Delete</button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div >
+        <button className="btn btn-primary m-2" onClick={() => router.push('/addproduct')}>Add Product</button>
+        <button className="btn btn-primary m-2" onClick={() => router.push('/addimage')}>Add Image</button>
       </div>
+    </div >
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+  )
 }
