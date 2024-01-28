@@ -20,7 +20,7 @@ export default function Page({ params }) {
             .catch((error) => {
                 console.log('error', error);
             })
-    }, [])
+    }, [params])
 
     function handleSubmit() {
         console.log("data", data)
